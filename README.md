@@ -1,4 +1,4 @@
-# 📸 Insta Former Username Remover
+# Insta Former Username Remover
 
 A Discord-based bot that helps reduce or remove your Instagram Former Usernames count by automatically updating your Instagram profile picture multiple times.
 
@@ -8,7 +8,7 @@ The bot is simple to use, privacy-focused, and includes a built-in Instagram Ses
 
 ---
 
-## ✨ Features
+## Features
 
 - 🤖 **Easy-to-use** Discord slash commands.
 - 🔄 **Automatically changes** your Instagram profile picture continuously.
