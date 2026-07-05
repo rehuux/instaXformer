@@ -1,1 +1,44 @@
+# ============== NODE ==============
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
+# ============== ENVIRONMENT ==============
+.env
+.env.local
+.env.*.local
+
+# ============== DISCORD ==============
+*.token
+*.secret
+
+# ============== INSTAGRAM ==============
+session*.json
+*.session
+
+# ============== OS ==============
+.DS_Store
+Thumbs.db
+
+# ============== IDE ==============
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============== LOGS ==============
+logs/
+*.log
+
+# ============== TEMP ==============
+tmp/
+temp/
+*.tmp
+
+# ============== BUILD ==============
+dist/
+build/
+*.tgz
