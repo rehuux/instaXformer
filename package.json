@@ -1,7 +1,7 @@
 {
-  "name": "instaXformer",
+  "name": "insta-former-username-remover",
   "version": "1.0.0",
-  "description": "🔄 Discord bot helps to remove former username",
+  "description": "🔄 Discord bot to change Instagram profile picture continuously",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -13,8 +13,10 @@
   "dependencies": {
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
-    "instagrapi": "^1.16.0",
-    "axios": "^1.6.0"
+    "instagram-private-api": "^1.45.3",
+    "axios": "^1.6.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
   },
   "author": "Syed Rehan (@rehuux)",
   "license": "MIT"
