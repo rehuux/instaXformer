@@ -1,4 +1,4 @@
-const { Client } = require('instagrapi');
+const { IgApiClient } = require('instagram-private-api');
 const fs = require('fs');
 const path = require('path');
 
@@ -6,19 +6,55 @@ console.log('🔧 Insta Former Username Remover');
 console.log('👤 Credit: Syed Rehan');
 console.log('📌 Dev: @rehuux (GitHub)');
 
+// ============== GET SESSION ID FROM USERNAME/PASSWORD ==============
+
+async function getSessionIdFromLogin(username, password) {
+    const ig = new IgApiClient();
+    ig.state.generateDevice(username);
+
+    try {
+        // Login
+        const loggedInUser = await ig.account.login(username, password);
+        console.log(`✅ Logged in as: ${loggedInUser.username}`);
+
+        // Extract session ID from cookies
+        const cookies = ig.state.cookies;
+        const sessionId = cookies.find(cookie => cookie.key === 'sessionid')?.value;
+
+        if (!sessionId) {
+            throw new Error('Failed to extract session ID after login');
+        }
+
+        return {
+            sessionid: sessionId,
+            user_id: loggedInUser.pk,
+            username: loggedInUser.username
+        };
+
+    } catch (error) {
+        throw new Error(`Login failed: ${error.message}`);
+    }
+}
+
 // ============== LOGIN WITH SESSION ID ==============
 
 async function loginWithSession(sessionId) {
-    const client = new Client();
+    const ig = new IgApiClient();
+    ig.state.generateDevice('');
 
     try {
-        client.setSession({
-            sessionid: sessionId
-        });
+        // Load session from cookies
+        const sessionCookie = {
+            key: 'sessionid',
+            value: sessionId,
+            domain: '.instagram.com'
+        };
+        ig.state.cookies.push(sessionCookie);
 
-        const user = await client.userInfo(client.user_id);
-        console.log(`✅ Logged in as: ${user.username}`);
-        return client;
+        // Get user ID from session
+        const userInfo = await ig.user.info(ig.state.cookieUserId);
+        console.log(`✅ Logged in with session: ${userInfo.username}`);
+        return ig;
     } catch (error) {
         throw new Error(`Failed to login with session ID: ${error.message}`);
     }
@@ -26,111 +62,35 @@ async function loginWithSession(sessionId) {
 
 // ============== CHANGE PROFILE PICTURE ==============
 
-async function changeInstagramPfp(client, imagePath) {
+async function changeInstagramPfp(ig, imagePath) {
     try {
-        await client.accountChangeProfilePicture(imagePath);
+        // Read image file
+        const imageBuffer = fs.readFileSync(imagePath);
+        
+        // Upload profile picture
+        await ig.account.changeProfilePicture(imageBuffer);
         return true;
     } catch (error) {
         throw new Error(`Failed to change profile picture: ${error.message}`);
     }
 }
 
-// ============== GET SESSION ID FROM USERNAME/PASSWORD ==============
-
-async function getSessionIdFromLogin(username, password) {
-    const client = new Client();
-    const sessionFilePath = path.join(__dirname, '../../session.json');
-
-    try {
-        // Try to load existing session first
-        if (fs.existsSync(sessionFilePath)) {
-            try {
-                client.load_settings(sessionFilePath);
-                // Check if session is valid
-                await client.get_timeline_feed();
-                console.log(`✅ Session loaded from file for: ${username}`);
-                
-                // Extract sessionid from settings
-                const settings = client.get_settings();
-                const sessionid = settings.authorization_data?.sessionid || 
-                                 settings.cookies?.sessionid || 
-                                 client.get_session()?.sessionid;
-                
-                if (sessionid) {
-                    return {
-                        sessionid: sessionid,
-                        user_id: client.user_id,
-                        username: username
-                    };
-                }
-            } catch (sessionError) {
-                console.log(`⚠️ Session invalid, logging in with password: ${sessionError.message}`);
-                // Remove invalid session file
-                fs.unlinkSync(sessionFilePath);
-            }
-        }
-
-        // Login with username and password
-        console.log(`🔑 Logging in as: ${username}`);
-        await client.login(username, password);
-        
-        // Dump session for future use
-        client.dump_settings(sessionFilePath);
-        console.log(`✅ Session saved to: ${sessionFilePath}`);
-
-        // Extract sessionid
-        const settings = client.get_settings();
-        const sessionid = settings.authorization_data?.sessionid || 
-                         settings.cookies?.sessionid || 
-                         client.get_session()?.sessionid;
-
-        if (!sessionid) {
-            throw new Error('Failed to extract session ID after login');
-        }
-
-        return {
-            sessionid: sessionid,
-            user_id: client.user_id,
-            username: username
-        };
-
-    } catch (error) {
-        // Clean up on error
-        if (fs.existsSync(sessionFilePath)) {
-            try {
-                fs.unlinkSync(sessionFilePath);
-            } catch (unlinkError) {
-                console.log(`⚠️ Could not remove session file: ${unlinkError.message}`);
-            }
-        }
-        throw new Error(`Login failed: ${error.message}`);
-    }
-}
-
-// ============== GET SESSION ID ONLY (Without Saving File) ==============
+// ============== GET SESSION ID ONLY ==============
 
 async function getSessionIdOnly(username, password) {
-    const client = new Client();
+    const ig = new IgApiClient();
+    ig.state.generateDevice(username);
 
     try {
-        await client.login(username, password);
-        
-        // Extract sessionid from settings
-        const settings = client.get_settings();
-        const sessionid = settings.authorization_data?.sessionid || 
-                         settings.cookies?.sessionid || 
-                         client.get_session()?.sessionid;
+        await ig.account.login(username, password);
+        const cookies = ig.state.cookies;
+        const sessionId = cookies.find(cookie => cookie.key === 'sessionid')?.value;
 
-        if (!sessionid) {
-            throw new Error('Failed to extract session ID after login');
+        if (!sessionId) {
+            throw new Error('Failed to extract session ID');
         }
 
-        return {
-            sessionid: sessionid,
-            user_id: client.user_id,
-            username: username
-        };
-
+        return sessionId;
     } catch (error) {
         throw new Error(`Login failed: ${error.message}`);
     }
