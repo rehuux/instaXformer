@@ -1,1 +1,21 @@
-
+{
+  "name": "instaXformer",
+  "version": "1.0.0",
+  "description": "🔄 Discord bot helps to remove former username",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node deploy-commands.js"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "instagrapi": "^1.16.0",
+    "axios": "^1.6.0"
+  },
+  "author": "Syed Rehan (@rehuux)",
+  "license": "MIT"
+}
