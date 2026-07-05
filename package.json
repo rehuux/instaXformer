@@ -14,9 +14,7 @@
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "instagram-private-api": "^1.45.3",
-    "axios": "^1.6.0",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7"
+    "axios": "^1.6.0"
   },
   "author": "Syed Rehan (@rehuux)",
   "license": "MIT"
